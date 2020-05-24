@@ -1,15 +1,17 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
+from flask_session import Session
 
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
-@app.route("/hello", methods=["POST"])
-def hello():
-    if request.method == "GET":
-        return "Please submit the form instead."
-    else:
-        name = request.form.get("name")
-        return render_template("hello.html", name=name)
+notes = []
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        note = request.form.get("note")
+        notes.append(note)
+    return render_template("index.html", notes=notes)
